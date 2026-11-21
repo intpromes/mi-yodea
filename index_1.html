@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi Yodea – Torá, Tanaj y Talmud</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1b3d">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Yodea">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1b3d; --bg2:#13265a; --card:#1a2f6b; --gold:#e8b931; --gold2:#f6d77a;
+  --ink:#f4f1e8; --mut:#a9b4d6; --ok:#2fbf71; --bad:#e5484d;
+  --c0:#c8902a; --c1:#2f7de1; --c2:#8a4fd8; --c3:#d9534f; --c4:#2aa876; --c5:#e07b24;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:Rubik,system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(120% 80% at 50% 0%,#1f3a86 0%,var(--bg) 60%) fixed;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:16px 16px 28px}
+.screen{display:none;flex:1;flex-direction:column;animation:fade .3s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2,.heb{font-family:"Frank Ruhl Libre",serif}
+.logo{text-align:center;margin:18px 0 6px}
+.logo .heb{font-size:56px;font-weight:900;color:var(--gold);line-height:1;text-shadow:0 3px 0 #8a6a12}
+.logo .lat{font-size:28px;font-weight:800;letter-spacing:.5px;margin-top:6px}
+.logo .sub{color:var(--mut);font-size:14px;margin-top:4px}
+.btn{
+  display:block;width:100%;border:0;border-radius:16px;padding:16px;font:700 18px Rubik,sans-serif;
+  color:#1b1405;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 5px 0 #9c7a17;
+  cursor:pointer;transition:transform .08s;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #9c7a17}
+.btn.ghost{background:var(--card);color:var(--ink);box-shadow:0 5px 0 #0a1533}
+.btn:disabled{opacity:.45;cursor:default}
+.levels{display:grid;gap:12px;margin:22px 0}
+.lvl{
+  display:flex;align-items:center;gap:14px;background:var(--card);border-radius:18px;padding:14px 16px;
+  border:2px solid transparent;cursor:pointer;text-align:left;color:var(--ink);font:inherit;width:100%
+}
+.lvl.sel{border-color:var(--gold)}
+.lvl.lock{opacity:.5;cursor:default}
+.lvl .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:26px;flex:none;
+  font-family:"Frank Ruhl Libre",serif;font-weight:900}
+.lvl b{display:block;font-size:19px}
+.lvl small{color:var(--mut);font-size:13px}
+.lvl .st{margin-left:auto;font-size:20px}
+.row{display:flex;gap:10px}
+.note{color:var(--mut);font-size:12.5px;text-align:center;margin-top:14px;line-height:1.5}
+.link{background:none;border:0;color:var(--gold2);font:500 13px Rubik;text-decoration:underline;cursor:pointer;padding:6px}
+
+/* HUD */
+.hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hud .pill{background:var(--card);border-radius:999px;padding:7px 13px;font-weight:700;font-size:15px}
+.lives span{font-size:18px;margin-left:2px}
+.back{background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;padding:4px 8px}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:6px 0 14px}
+.slot{aspect-ratio:1;border-radius:12px;display:grid;place-items:center;background:#0a1533;
+  font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:19px;color:#3b4a78;border:2px dashed #2b3b6b;transition:.3s}
+.slot.got{color:#fff;border-style:solid;border-color:rgba(255,255,255,.35);transform:scale(1.04)}
+
+/* Wheel */
+.wheelbox{position:relative;width:min(88vw,360px);aspect-ratio:1;margin:8px auto 18px}
+.wheel{width:100%;height:100%;transition:transform 4.2s cubic-bezier(.12,.75,.12,1);filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+.pointer{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;
+  border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--gold);z-index:2;
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+.hub{position:absolute;inset:0;margin:auto;width:24%;height:24%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--gold2),var(--gold) 60%,#a37c12);display:grid;place-items:center;
+  color:#3a2a03;font:900 26px "Frank Ruhl Libre",serif;box-shadow:0 0 0 6px #0d1b3d,0 0 0 9px var(--gold)}
+.spinmsg{text-align:center;min-height:26px;font-weight:700;font-size:18px;margin-bottom:12px}
+
+/* Question */
+.qcat{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-weight:700;font-size:14px;align-self:flex-start}
+.timer{height:8px;background:#0a1533;border-radius:99px;overflow:hidden;margin:14px 0}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .25s linear}
+.qtext{background:var(--ink);color:#16224a;border-radius:20px;padding:22px 18px;font-size:20px;font-weight:700;line-height:1.35;
+  min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:0 6px 0 #b9b39f}
+.opts{display:grid;gap:10px;margin-top:18px}
+.opt{border:0;border-radius:14px;padding:15px 14px;font:600 17px Rubik;background:var(--card);color:var(--ink);
+  text-align:left;cursor:pointer;box-shadow:0 4px 0 #0a1533;transition:.15s}
+.opt.ok{background:var(--ok);color:#fff}
+.opt.bad{background:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.fb{margin-top:16px;background:#0a1533;border-radius:16px;padding:14px 16px;display:none}
+.fb.on{display:block;animation:fade .25s}
+.fb b{font-size:18px}
+.fb .src{color:var(--gold2);font-size:14px;margin-top:6px}
+.fb .btn{margin-top:14px}
+
+/* Result */
+.result{text-align:center;margin-top:30px}
+.result .big{font-size:64px}
+.result h2{font-size:32px;margin:10px 0 6px;color:var(--gold)}
+.result p{color:var(--mut);margin:0 0 6px}
+.result .score{font-size:44px;font-weight:800;margin:14px 0 24px}
+.stack{display:grid;gap:12px}
+.modal{position:fixed;inset:0;background:rgba(5,10,30,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:9}
+.modal.on{display:flex}
+.modal .box{background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;text-align:center}
+.modal .box p{color:var(--mut);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <section class="screen on" id="home">
+    <div class="logo">
+      <div class="heb">מִי יוֹדֵעַ?</div>
+      <div class="lat">Mi Yodea</div>
+      <div class="sub">Torá · Tanaj · Talmud · Halajá sefaradí</div>
+    </div>
+    <div class="levels" id="levels"></div>
+    <div class="stack">
+      <button class="btn" id="playSolo">▶ Jugar solo</button>
+      <button class="btn ghost" id="playVs">⚔ Retar a un contacto</button>
+    </div>
+    <p class="note">Gira la ruleta, responde y gana la letra de cada categoría.<br>Junta las 6 antes de perder tus 3 vidas.</p>
+    <p class="note" style="margin-top:4px">Prototipo · las preguntas deben ser revisadas por un rabino antes de publicar.<br>
+      <button class="link" id="unlockAll">Desbloquear todos los niveles (prueba)</button></p>
+  </section>
+
+  <!-- SPIN -->
+  <section class="screen" id="spin">
+    <div class="hud">
+      <button class="back" data-home>✕</button>
+      <div class="pill" id="lvlName">Talmid</div>
+      <div class="pill lives" id="lives1"></div>
+      <div class="pill" id="score1">0</div>
+    </div>
+    <div class="slots" id="slots1"></div>
+    <div class="spinmsg" id="spinMsg">¡Gira la ruleta!</div>
+    <div class="wheelbox">
+      <div class="pointer"></div>
+      <svg class="wheel" id="wheel" viewBox="0 0 300 300"></svg>
+      <div class="hub">מי</div>
+    </div>
+    <button class="btn" id="spinBtn">Girar</button>
+  </section>
+
+  <!-- QUESTION -->
+  <section class="screen" id="question">
+    <div class="hud">
+      <span class="qcat" id="qcat"></span>
+      <div class="pill lives" id="lives2"></div>
+      <div class="pill" id="score2">0</div>
+    </div>
+    <div class="timer"><i id="timerBar"></i></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb">
+      <b id="fbTitle"></b>
+      <div class="src" id="fbSrc"></div>
+      <button class="btn" id="nextBtn">Continuar</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="result">
+    <div class="result">
+      <div class="big" id="resIcon">🏆</div>
+      <h2 id="resTitle"></h2>
+      <p id="resText"></p>
+      <div class="score" id="resScore"></div>
+      <div class="stack">
+        <button class="btn" id="againBtn">Jugar otra vez</button>
+        <button class="btn ghost" data-home>Inicio</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="vsModal"><div class="box">
+  <div style="font-size:44px">⚔</div>
+  <h2 style="margin:6px 0">Próximamente</h2>
+  <p>El modo contra un contacto (partidas por turnos con enlace por WhatsApp) se agrega en la siguiente fase, con cuentas de usuario y servidor.</p>
+  <button class="btn" id="vsClose">Entendido</button>
+</div></div>
+
+<script>
+const CATS=[
+  {id:"tora",   name:"Torá",            heb:"תורה",    ini:"ת", color:"var(--c0)", hex:"#c8902a"},
+  {id:"neviim", name:"Neviím",          heb:"נביאים",  ini:"נ", color:"var(--c1)", hex:"#2f7de1"},
+  {id:"ketuvim",name:"Ketuvim",         heb:"כתובים",  ini:"כ", color:"var(--c2)", hex:"#8a4fd8"},
+  {id:"talmud", name:"Mishná y Talmud", heb:"תלמוד",   ini:"ש", color:"var(--c3)", hex:"#d9534f"},
+  {id:"halaja", name:"Halajá sefaradí", heb:"הלכה",    ini:"ה", color:"var(--c4)", hex:"#2aa876"},
+  {id:"moadim", name:"Moadim",          heb:"מועדים",  ini:"מ", color:"var(--c5)", hex:"#e07b24"}
+];
+const LEVELS=[
+  {n:1,name:"Talmid",heb:"תלמיד",desc:"Básico · parashá, personajes, festividades",time:20,ic:"א"},
+  {n:2,name:"Jabér", heb:"חבר",  desc:"Medio · pesukim, mitzvot, libros",time:22,ic:"ב"},
+  {n:3,name:"Jajam", heb:"חכם",  desc:"Avanzado · Guemará, psak sefaradí",time:25,ic:"ג"}
+];
+// [categoría, nivel, pregunta, [opciones], índice correcto, fuente]
+const Q=[
+// TORÁ
+["tora",1,"¿Cuántos libros tiene la Torá (Jumash)?",["5","4","7","10"],0,"Los Jamishá Jumshé Torá"],
+["tora",1,"¿Quién construyó la tevá (arca) antes del diluvio?",["Nóaj","Abraham","Moshé","Adam"],0,"Bereshit 6:14"],
+["tora",1,"¿Cuántos hijos varones tuvo Yaakov Avinu?",["12","10","7","13"],0,"Bereshit 35:22"],
+["tora",1,"¿En qué día de la Creación fue creada la luz?",["El primero","El segundo","El cuarto","El sexto"],0,"Bereshit 1:3–5"],
+["tora",2,"¿Cuál fue la primera de las diez makot de Egipto?",["Sangre (Dam)","Ranas (Tzefardea)","Piojos (Kinim)","Granizo (Barad)"],0,"Shemot 7:20"],
+["tora",2,"¿Cuántos años vivió Moshé Rabenu?",["120","100","130","175"],0,"Devarim 34:7"],
+["tora",2,"¿En qué parashá aparecen por primera vez las Aséret HaDibrot?",["Yitró","Mishpatim","Vaetjanán","Bo"],0,"Shemot 20"],
+["tora",2,"¿Qué edad tenía Abraham cuando nació Yitzjak?",["100 años","90 años","75 años","120 años"],0,"Bereshit 21:5"],
+["tora",3,"¿Cuál es la parashá más larga de la Torá (176 pesukim)?",["Nasó","Bereshit","Pinjás","Ki Tavó"],0,"Bamidbar 4:21–7:89"],
+["tora",3,"¿Cuántas parashiot tiene la Torá?",["54","52","50","48"],0,"Ciclo anual de lectura"],
+["tora",3,"¿Con qué letra termina la Torá?",["Lamed (ל)","Mem (מ)","Bet (ב)","Tav (ת)"],0,"Devarim 34:12 — «…Israel»"],
+["tora",3,"Según la Guemará, ¿cuántas mitzvot fueron dadas a Moshé en Sinaí?",["613","248","365","620"],0,"Makot 23b"],
+// NEVIÍM
+["neviim",1,"¿Quién sucedió a Moshé como líder de Israel?",["Yehoshúa","Kalev","Aharón","Pinjás"],0,"Devarim 34:9"],
+["neviim",1,"¿Quién venció a Goliat?",["David","Shaúl","Yonatán","Shimshón"],0,"Shmuel I 17"],
+["neviim",1,"¿Qué profeta fue tragado por un gran pez?",["Yoná","Eliyahu","Yeshayahu","Amós"],0,"Yoná 2:1"],
+["neviim",2,"¿Qué profeta subió al cielo en un carro de fuego?",["Eliyahu","Elishá","Shmuel","Yirmiyahu"],0,"Melajim II 2:11"],
+["neviim",2,"¿Quién construyó el primer Bet HaMikdash?",["Shlomó HaMelej","David HaMelej","Jizkiyahu","Ezrá"],0,"Melajim I 6"],
+["neviim",2,"¿Qué ciudad cayó al sonar los shofarot?",["Yerijó","Ai","Jevrón","Shiló"],0,"Yehoshúa 6:20"],
+["neviim",2,"¿Qué profetisa juzgaba a Israel bajo una palmera?",["Devorá","Jana","Huldá","Miriam"],0,"Shoftim 4:4–5"],
+["neviim",3,"¿Qué profeta tuvo la visión de los huesos secos?",["Yejezkel","Yeshayahu","Yirmiyahu","Zejariá"],0,"Yejezkel 37"],
+["neviim",3,"¿Quién ungió a Shaúl como primer rey de Israel?",["Shmuel","Natán","Elí","Gad"],0,"Shmuel I 10:1"],
+["neviim",3,"¿Qué rey de Babilonia destruyó el primer Bet HaMikdash?",["Nevujadnetzar","Koresh","Ajashverosh","Sanjeriv"],0,"Melajim II 25:8–9"],
+["neviim",3,"¿Cuál es el último libro de Trei Asar?",["Malají","Jagai","Zejariá","Ovadiá"],0,"Orden de Neviím"],
+// KETUVIM
+["ketuvim",1,"¿Quién compuso la mayoría de los Tehilim?",["David HaMelej","Shlomó HaMelej","Moshé Rabenu","Asaf"],0,"Bavá Batrá 14b"],
+["ketuvim",1,"¿En qué festividad se lee Meguilat Ester?",["Purim","Janucá","Pésaj","Sucot"],0,"Ester 9:28"],
+["ketuvim",1,"¿Cómo se llamaba la suegra de Rut?",["Naomí","Orpá","Ester","Jana"],0,"Rut 1"],
+["ketuvim",2,"¿Quién fue arrojado al foso de los leones?",["Daniel","Mordejai","Ezrá","Nejemiá"],0,"Daniel 6"],
+["ketuvim",2,"¿Qué parentesco tenía Mordejai con Ester?",["Primo","Tío","Padre","Hermano"],0,"Ester 2:7 — «bat dodó»"],
+["ketuvim",2,"¿Cuántos capítulos tiene el libro de Tehilim?",["150","120","176","100"],0,"Sefer Tehilim"],
+["ketuvim",2,"¿Qué meguilá se acostumbra leer en Shavuot?",["Rut","Ester","Ejá","Shir HaShirim"],0,"Masejet Soferim 14"],
+["ketuvim",3,"¿Cuál es el último libro del Tanaj en el orden tradicional?",["Divré HaYamim","Ezrá","Nejemiá","Daniel"],0,"Bavá Batrá 14b"],
+["ketuvim",3,"Según el Midrash, ¿qué libro escribió Shlomó en su vejez?",["Kohélet","Mishlé","Shir HaShirim","Iyov"],0,"Shir HaShirim Rabá 1:1"],
+["ketuvim",3,"¿Qué salmo es un acróstico con 8 pesukim por cada letra?",["119","23","145","136"],0,"Tehilim 119"],
+// TALMUD
+["talmud",1,"¿Cuántos sedarim (órdenes) tiene la Mishná?",["6","5","7","12"],0,"«Shas» = Shishá Sedarim"],
+["talmud",1,"¿Quién compiló la Mishná?",["Rabí Yehudá HaNasí","Rabí Akiva","Hilel","Rav Ashí"],0,"Tradición; Iguéret Rav Sherirá Gaón"],
+["talmud",1,"¿En qué idioma está escrita principalmente la Guemará?",["Arameo","Hebreo","Griego","Ladino"],0,"Talmud Bavlí"],
+["talmud",2,"¿Cuál es el primer tratado de la Mishná?",["Berajot","Shabat","Pea","Bavá Kamá"],0,"Seder Zeraím"],
+["talmud",2,"¿Cuál de estos NO es un seder de la Mishná?",["Berajot","Moed","Nashim","Tohorot"],0,"Los 6 sedarim: Zeraím, Moed, Nashim, Nezikín, Kodashim, Tohorot"],
+["talmud",2,"¿Quién dijo: «Lo que te es odioso, no lo hagas a tu prójimo»?",["Hilel","Shamai","Rabí Akiva","Rabí Meír"],0,"Shabat 31a"],
+["talmud",2,"¿En qué seder se encuentra Pirké Avot?",["Nezikín","Moed","Nashim","Zeraím"],0,"Seder Nezikín"],
+["talmud",2,"¿Qué comentario aparece en la columna interior de la página del Talmud?",["Rashi","Tosafot","Rambam","Maharshá"],0,"Disposición clásica de la página (Vilna)"],
+["talmud",3,"¿Cuántos tratados del Talmud Bavlí tienen Guemará?",["37","63","40","24"],0,"Ciclo del Daf Yomi"],
+["talmud",3,"¿Cuántas dafim recorre el ciclo de Daf Yomi?",["2711","1820","3000","2200"],0,"Ciclo del Daf Yomi"],
+["talmud",3,"¿Qué tratado estudia las leyes de Yom Kipur?",["Yomá","Taanit","Meguilá","Jaguigá"],0,"Masejet Yomá"],
+["talmud",3,"«¿Desde cuándo se lee el Shemá de la noche?» ¿Con qué tratado empieza así?",["Berajot","Shabat","Pesajim","Sucá"],0,"Mishná Berajot 1:1"],
+// HALAJÁ SEFARADÍ
+["halaja",1,"¿Quién escribió el Shulján Aruj?",["Rabí Yosef Karo","Rabí Moshé Isserles","El Rambam","Rabí Yaakov ben Asher"],0,"Shulján Aruj (Venecia, 1565)"],
+["halaja",1,"¿Quién escribió el Ben Ish Jai?",["Rabí Yosef Jaim de Bagdad","Rav Ovadia Yosef","El Jidá","Rabí Jaim Vital"],0,"Ben Ish Jai"],
+["halaja",1,"¿Qué significa «Shulján Aruj»?",["Mesa servida","Libro de leyes","Camino recto","Luz eterna"],0,"Traducción literal"],
+["halaja",2,"Según el Shulján Aruj, ¿cuánto se espera entre carne y leche?",["6 horas","3 horas","1 hora","24 horas"],0,"Shulján Aruj, Yoré Deá 89:1"],
+["halaja",2,"¿Pueden los sefaradim comer kitniyot (arroz, legumbres) en Pésaj?",["Sí","No","Solo en Jol HaMoed","Solo el arroz"],0,"Shulján Aruj, Óraj Jaim 453:1"],
+["halaja",2,"¿Quién escribió el Yalkut Yosef?",["Rav Yitzjak Yosef","Rav Ovadia Yosef","Rav Mordejai Eliyahu","Rav Ben Tzion Abbá Shaúl"],0,"Yalkut Yosef"],
+["halaja",3,"Según el Shulján Aruj, ¿se bendice sobre el Halel de Rosh Jodesh?",["No, se dice sin berajá","Sí, siempre","Solo el jazán","Solo en Shabat"],0,"Shulján Aruj, Óraj Jaim 422:2"],
+["halaja",3,"Según la costumbre sefaradí, ¿se ponen tefilín en Jol HaMoed?",["No","Sí, con berajá","Sí, sin berajá","Solo el Shel Rosh"],0,"Shulján Aruj, Óraj Jaim 31:2"],
+["halaja",3,"¿Cuál de estas es una obra de responsa de Rav Ovadia Yosef?",["Yabía Ómer","Mishná Berurá","Igrot Moshé","Arúj HaShulján"],0,"Shu\"t Yabía Ómer"],
+["halaja",3,"¿Sobre qué obra escribió Rabí Yosef Karo el Bet Yosef?",["El Tur","El Rif","La Mishné Torá","El Zóhar"],0,"Bet Yosef sobre el Arbaá Turim"],
+// MOADIM
+["moadim",1,"¿Cuántos días dura Janucá?",["8","7","10","6"],0,"Shabat 21b"],
+["moadim",1,"¿Qué se come en Pésaj en lugar de pan?",["Matzá","Jalá","Pita","Bourekas"],0,"Shemot 12:15"],
+["moadim",1,"¿En qué fecha es Yom Kipur?",["10 de Tishrí","1 de Tishrí","15 de Nisán","9 de Av"],0,"Vaykrá 23:27"],
+["moadim",2,"¿Cuántos días se cuenta el Ómer?",["49","50","40","7"],0,"Vaykrá 23:15–16"],
+["moadim",2,"¿Cuántas especies se toman en Sucot?",["4","3","5","7"],0,"Vaykrá 23:40"],
+["moadim",2,"¿Qué ayuno recuerda la destrucción de ambos Batei Mikdash?",["Tishá BeAv","Tzom Guedaliá","10 de Tevet","Taanit Ester"],0,"Mishná Taanit 4:6"],
+["moadim",2,"¿En qué fecha comienza Janucá?",["25 de Kislev","15 de Shvat","14 de Adar","25 de Tevet"],0,"Shabat 21b"],
+["moadim",3,"¿Desde cuándo dicen Selijot los sefaradim?",["Desde Rosh Jodesh Elul","Una semana antes de Rosh Hashaná","Desde Tu BeAv","Solo en Yom Kipur"],0,"Shulján Aruj, Óraj Jaim 581:1"],
+["moadim",3,"¿Cuántos toques de shofar se acostumbra escuchar en Rosh Hashaná?",["100","30","40","72"],0,"Tosafot, Rosh Hashaná 33b (citando al Arúj)"],
+["moadim",3,"¿Qué se agrega en la Amidá desde Sheminí Atzeret?",["Mashiv harúaj umorid hagueshem","Yaalé veyavó","Al hanisim","Anenu"],0,"Shulján Aruj, Óraj Jaim 114:1"],
+["moadim",3,"Según Bet Hilel, ¿qué fecha es Rosh Hashaná de los árboles?",["15 de Shvat","1 de Shvat","15 de Av","1 de Elul"],0,"Mishná Rosh Hashaná 1:1"]
+].map(([cat,lvl,q,opts,a,src])=>({cat,lvl,q,opts,a,src}));
+
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+             set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let unlocked=store.get("my_unlocked",1), done=store.get("my_done",[]);
+let level=1, S=null, rot=0, timerId=null;
+
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));window.scrollTo(0,0)}
+document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{clearInterval(timerId);renderLevels();show("home")});
+
+function renderLevels(){
+  const box=$("#levels");box.innerHTML="";
+  if(level>unlocked)level=unlocked;
+  LEVELS.forEach(L=>{
+    const lock=L.n>unlocked, b=document.createElement("button");
+    b.className="lvl"+(L.n===level?" sel":"")+(lock?" lock":"");
+    b.innerHTML=`<span class="ic" style="background:${lock?'#0a1533':'#0d1b3d'};color:var(--gold)">${L.heb.charAt(0)}</span>
+      <span><b>${L.name} <span class="heb" style="color:var(--mut);font-weight:500">${L.heb}</span></b><small>${L.desc}</small></span>
+      <span class="st">${lock?"🔒":done.includes(L.n)?"👑":""}</span>`;
+    if(!lock)b.onclick=()=>{level=L.n;renderLevels()};
+    box.appendChild(b);
+  });
+}
+
+function drawWheel(){
+  const svg=$("#wheel"),c=150,r=146,n=CATS.length;let h="";
+  const pt=(a,rr)=>[c+rr*Math.sin(a*Math.PI/180),c-rr*Math.cos(a*Math.PI/180)];
+  CATS.forEach((k,i)=>{
+    const a0=i*60,a1=a0+60,[x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r),mid=a0+30,[tx,ty]=pt(mid,96);
+    h+=`<path d="M${c},${c} L${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1} Z" fill="${k.hex}" stroke="#0d1b3d" stroke-width="3"/>`;
+    h+=`<text x="${tx}" y="${ty}" transform="rotate(${mid} ${tx} ${ty})" text-anchor="middle" dominant-baseline="middle"
+         fill="#fff" font-family="Frank Ruhl Libre" font-weight="900" font-size="22">${k.heb}</text>`;
+    const [sx,sy]=pt(mid,128);
+    h+=`<text x="${sx}" y="${sy}" transform="rotate(${mid} ${sx} ${sy})" text-anchor="middle" dominant-baseline="middle"
+         fill="rgba(255,255,255,.85)" font-family="Rubik" font-weight="700" font-size="9.5">${k.name.toUpperCase()}</text>`;
+  });
+  h+=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#e8b931" stroke-width="6"/>`;
+  for(let i=0;i<24;i++){const[x,y]=pt(i*15,r);h+=`<circle cx="${x}" cy="${y}" r="3.2" fill="#f6d77a"/>`}
+  svg.innerHTML=h;
+}
+
+function newGame(){
+  S={lives:3,score:0,got:new Set(),used:new Set()};
+  const L=LEVELS[level-1];$("#lvlName").textContent=L.name;
+  updHud();$("#spinMsg").textContent="¡Gira la ruleta!";$("#spinBtn").disabled=false;show("spin");
+}
+function updHud(){
+  const hearts="❤️".repeat(S.lives)+"🤍".repeat(3-S.lives);
+  $("#lives1").innerHTML=$("#lives2").innerHTML=hearts;
+  $("#score1").textContent=$("#score2").textContent=S.score;
+  $("#slots1").innerHTML=CATS.map(k=>`<div class="slot ${S.got.has(k.id)?'got':''}" style="${S.got.has(k.id)?'background:'+k.hex:''}">${k.ini}</div>`).join("");
+}
+
+$("#spinBtn").onclick=()=>{
+  $("#spinBtn").disabled=true;$("#spinMsg").textContent="Girando…";
+  // preferir categorías aún no ganadas
+  const pend=CATS.map((k,i)=>i).filter(i=>!S.got.has(CATS[i].id));
+  const idx=Math.random()<.8&&pend.length?pend[Math.floor(Math.random()*pend.length)]:Math.floor(Math.random()*6);
+  const target=360-(idx*60+30)+(Math.random()*30-15);
+  const cur=((rot%360)+360)%360;
+  rot+=360*5+((target-cur+360)%360);
+  $("#wheel").style.transform=`rotate(${rot}deg)`;
+  setTimeout(()=>{const k=CATS[idx];$("#spinMsg").innerHTML=`<span style="color:${k.hex}">${k.name}</span>`;setTimeout(()=>ask(k),700)},4300);
+};
+
+function pick(cat){
+  let pool=Q.filter(q=>q.cat===cat.id&&q.lvl===level&&!S.used.has(q));
+  if(!pool.length){Q.filter(q=>q.cat===cat.id&&q.lvl===level).forEach(q=>S.used.delete(q));pool=Q.filter(q=>q.cat===cat.id&&q.lvl===level)}
+  const q=pool[Math.floor(Math.random()*pool.length)];S.used.add(q);return q;
+}
+
+function ask(cat){
+  const q=pick(cat),L=LEVELS[level-1];
+  $("#qcat").innerHTML=`<span class="heb" style="font-size:17px">${cat.heb}</span> ${cat.name}`;
+  $("#qcat").style.background=cat.hex;
+  $("#qtext").textContent=q.q;
+  const order=[0,1,2,3].sort(()=>Math.random()-.5);
+  $("#opts").innerHTML="";
+  order.forEach(i=>{const b=document.createElement("button");b.className="opt";b.textContent=q.opts[i];b.dataset.i=i;
+    b.onclick=()=>answer(q,cat,i);$("#opts").appendChild(b)});
+  $("#fb").classList.remove("on");updHud();show("question");
+  let t=L.time;const bar=$("#timerBar");bar.style.transition="none";bar.style.width="100%";
+  requestAnimationFrame(()=>{bar.style.transition="width .25s linear"});
+  clearInterval(timerId);
+  S.t0=Date.now();
+  timerId=setInterval(()=>{const left=L.time-(Date.now()-S.t0)/1000;bar.style.width=Math.max(0,left/L.time*100)+"%";
+    if(left<=0){clearInterval(timerId);answer(q,cat,-1)}},200);
+}
+
+function answer(q,cat,i){
+  clearInterval(timerId);
+  const ok=i===q.a,L=LEVELS[level-1],left=Math.max(0,L.time-(Date.now()-S.t0)/1000);
+  document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;const bi=+b.dataset.i;
+    if(bi===q.a)b.classList.add("ok");else if(bi===i)b.classList.add("bad")});
+  if(ok){const pts=10*level+Math.round(left);S.score+=pts;S.got.add(cat.id);
+    $("#fbTitle").innerHTML=`✅ ¡Correcto! +${pts} <span style="color:var(--mut);font-weight:500">· ganaste la ${cat.ini}</span>`}
+  else{S.lives--;$("#fbTitle").textContent=i===-1?"⏰ Se acabó el tiempo":"❌ Incorrecto"}
+  $("#fbSrc").textContent="Fuente: "+q.src;
+  updHud();$("#fb").classList.add("on");
+}
+
+$("#nextBtn").onclick=()=>{
+  if(S.got.size===6)return finish(true);
+  if(S.lives<=0)return finish(false);
+  $("#spinBtn").disabled=false;$("#spinMsg").textContent="¡Gira otra vez!";show("spin");
+};
+
+function finish(win){
+  const L=LEVELS[level-1];
+  if(win){if(!done.includes(level))done.push(level);if(unlocked<level+1&&level<3)unlocked=level+1;
+    store.set("my_done",done);store.set("my_unlocked",unlocked)}
+  $("#resIcon").textContent=win?"👑":"📖";
+  $("#resTitle").textContent=win?`¡Completaste ${L.name}!`:"Fin de la partida";
+  $("#resText").textContent=win?(level<3?`Desbloqueaste el nivel ${LEVELS[level].name}.`:"¡Eres un verdadero Jajam!"):
+    `Ganaste ${S.got.size} de 6 letras. Sigue estudiando.`;
+  $("#resScore").textContent=S.score+" pts";
+  $("#againBtn").textContent=win&&level<3?`Jugar ${LEVELS[level].name}`:"Jugar otra vez";
+  $("#againBtn").onclick=()=>{if(win&&level<3)level++;newGame()};
+  show("result");
+}
+
+$("#playSolo").onclick=newGame;
+$("#playVs").onclick=()=>$("#vsModal").classList.add("on");
+$("#vsClose").onclick=()=>$("#vsModal").classList.remove("on");
+$("#unlockAll").onclick=()=>{unlocked=3;store.set("my_unlocked",3);renderLevels()};
+drawWheel();renderLevels();
+if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
