@@ -27,7 +27,7 @@ body{
   background:radial-gradient(120% 80% at 50% 0%,#1f3a86 0%,var(--bg) 60%) fixed;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-.app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:16px 16px 28px}
+.app{position:relative;max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:16px 16px 28px}
 .screen{display:none;flex:1;flex-direction:column;animation:fade .3s ease}
 .screen.on{display:flex}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -106,6 +106,8 @@ h1,h2,.heb{font-family:"Frank Ruhl Libre",serif}
 .result p{color:var(--mut);margin:0 0 6px}
 .result .score{font-size:44px;font-weight:800;margin:14px 0 24px}
 .stack{display:grid;gap:12px}
+.sound{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;background:var(--card);border:0;border-radius:999px;
+  width:44px;height:44px;font-size:20px;cursor:pointer;color:var(--ink)}
 .modal{position:fixed;inset:0;background:rgba(5,10,30,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:9}
 .modal.on{display:flex}
 .modal .box{background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;text-align:center}
@@ -117,6 +119,7 @@ h1,h2,.heb{font-family:"Frank Ruhl Libre",serif}
 
   <!-- HOME -->
   <section class="screen on" id="home">
+    <button class="sound" id="soundBtn" aria-label="Sonido">🔊</button>
     <div class="logo">
       <div class="heb">מִי יוֹדֵעַ?</div>
       <div class="lat">Mi Yodea</div>
@@ -280,6 +283,32 @@ const Q=[
 ].map(([cat,lvl,q,opts,a,src])=>({cat,lvl,q,opts,a,src}));
 
 const $=s=>document.querySelector(s);
+// ---- Sonido (Web Audio, sin archivos) ----
+const SND={on:true,ctx:null};
+try{SND.on=localStorage.getItem("my_sound")!=="0"}catch(e){}
+function ac(){if(!SND.ctx){try{SND.ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+  if(SND.ctx&&SND.ctx.state==="suspended")SND.ctx.resume();return SND.ctx}
+function tone(f,d,{type="sine",vol=.18,at=0,slide=0}={}){
+  if(!SND.on)return;const c=ac();if(!c)return;const t=c.currentTime+at;
+  const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}
+function buzz(ms){if(SND.on&&navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}}
+const sfx={
+  tap(){tone(660,.06,{type:"triangle",vol:.08})},
+  tick(){tone(1400,.03,{type:"square",vol:.05})},
+  spin(){ // clics que se van frenando como la ruleta
+    let t=0,gap=.035;while(t<4.1){tone(1200+Math.random()*200,.025,{type:"square",vol:.045,at:t});t+=gap;gap*=1.075}},
+  land(){tone(523,.12,{type:"triangle",at:0});tone(784,.18,{type:"triangle",at:.1})},
+  ok(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,{type:"triangle",vol:.16,at:i*.08}));buzz(40)},
+  bad(){tone(220,.35,{type:"sawtooth",vol:.12,slide:110});buzz([80,60,80])},
+  clock(){tone(880,.05,{type:"sine",vol:.1})},
+  win(){[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.25,{type:"triangle",vol:.17,at:i*.13}));tone(1568,.6,{type:"sine",vol:.1,at:.8});buzz([60,40,60,40,120])},
+  lose(){[392,330,262].forEach((f,i)=>tone(f,.3,{type:"triangle",vol:.14,at:i*.22}))}
+};
+function setSound(v){SND.on=v;try{localStorage.setItem("my_sound",v?"1":"0")}catch(e){}$("#soundBtn").textContent=v?"🔊":"🔇";if(v){ac();sfx.tap()}}
+
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let unlocked=store.get("my_unlocked",1), done=store.get("my_done",[]);
@@ -332,7 +361,7 @@ function updHud(){
 }
 
 $("#spinBtn").onclick=()=>{
-  $("#spinBtn").disabled=true;$("#spinMsg").textContent="Girando…";
+  $("#spinBtn").disabled=true;$("#spinMsg").textContent="Girando…";sfx.spin();
   // preferir categorías aún no ganadas
   const pend=CATS.map((k,i)=>i).filter(i=>!S.got.has(CATS[i].id));
   const idx=Math.random()<.8&&pend.length?pend[Math.floor(Math.random()*pend.length)]:Math.floor(Math.random()*6);
@@ -340,7 +369,7 @@ $("#spinBtn").onclick=()=>{
   const cur=((rot%360)+360)%360;
   rot+=360*5+((target-cur+360)%360);
   $("#wheel").style.transform=`rotate(${rot}deg)`;
-  setTimeout(()=>{const k=CATS[idx];$("#spinMsg").innerHTML=`<span style="color:${k.hex}">${k.name}</span>`;setTimeout(()=>ask(k),700)},4300);
+  setTimeout(()=>{const k=CATS[idx];$("#spinMsg").innerHTML=`<span style="color:${k.hex}">${k.name}</span>`;sfx.land();setTimeout(()=>ask(k),700)},4300);
 };
 
 function pick(cat){
@@ -363,7 +392,9 @@ function ask(cat){
   requestAnimationFrame(()=>{bar.style.transition="width .25s linear"});
   clearInterval(timerId);
   S.t0=Date.now();
+  S.lastSec=99;
   timerId=setInterval(()=>{const left=L.time-(Date.now()-S.t0)/1000;bar.style.width=Math.max(0,left/L.time*100)+"%";
+    const sec=Math.ceil(left);if(sec<=5&&sec>0&&sec<S.lastSec){S.lastSec=sec;sfx.clock()}
     if(left<=0){clearInterval(timerId);answer(q,cat,-1)}},200);
 }
 
@@ -372,6 +403,7 @@ function answer(q,cat,i){
   const ok=i===q.a,L=LEVELS[level-1],left=Math.max(0,L.time-(Date.now()-S.t0)/1000);
   document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;const bi=+b.dataset.i;
     if(bi===q.a)b.classList.add("ok");else if(bi===i)b.classList.add("bad")});
+  if(ok)sfx.ok();else sfx.bad();
   if(ok){const pts=10*level+Math.round(left);S.score+=pts;S.got.add(cat.id);
     $("#fbTitle").innerHTML=`✅ ¡Correcto! +${pts} <span style="color:var(--mut);font-weight:500">· ganaste la ${cat.ini}</span>`}
   else{S.lives--;$("#fbTitle").textContent=i===-1?"⏰ Se acabó el tiempo":"❌ Incorrecto"}
@@ -389,7 +421,7 @@ function finish(win){
   const L=LEVELS[level-1];
   if(win){if(!done.includes(level))done.push(level);if(unlocked<level+1&&level<3)unlocked=level+1;
     store.set("my_done",done);store.set("my_unlocked",unlocked)}
-  $("#resIcon").textContent=win?"👑":"📖";
+  $("#resIcon").textContent=win?"👑":"📖";setTimeout(()=>win?sfx.win():sfx.lose(),150);
   $("#resTitle").textContent=win?`¡Completaste ${L.name}!`:"Fin de la partida";
   $("#resText").textContent=win?(level<3?`Desbloqueaste el nivel ${LEVELS[level].name}.`:"¡Eres un verdadero Jajam!"):
     `Ganaste ${S.got.size} de 6 letras. Sigue estudiando.`;
@@ -399,7 +431,10 @@ function finish(win){
   show("result");
 }
 
-$("#playSolo").onclick=newGame;
+$("#playSolo").onclick=()=>{ac();sfx.tap();newGame()};
+$("#soundBtn").onclick=()=>setSound(!SND.on);
+$("#soundBtn").textContent=SND.on?"🔊":"🔇";
+document.addEventListener("click",e=>{if(e.target.closest(".lvl,.btn.ghost,#nextBtn,#againBtn"))sfx.tap()});
 $("#playVs").onclick=()=>$("#vsModal").classList.add("on");
 $("#vsClose").onclick=()=>$("#vsModal").classList.remove("on");
 $("#unlockAll").onclick=()=>{unlocked=3;store.set("my_unlocked",3);renderLevels()};
