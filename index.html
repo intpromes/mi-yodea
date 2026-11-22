@@ -65,9 +65,9 @@ h1,h2,.heb{font-family:"Frank Ruhl Libre",serif}
 .hud .pill{background:var(--card);border-radius:999px;padding:7px 13px;font-weight:700;font-size:15px}
 .lives span{font-size:18px;margin-left:2px}
 .back{background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;padding:4px 8px}
-.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:6px 0 14px}
+.slots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:6px 0 14px}
 .slot{aspect-ratio:1;border-radius:12px;display:grid;place-items:center;background:#0a1533;
-  font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:19px;color:#3b4a78;border:2px dashed #2b3b6b;transition:.3s}
+  font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:17px;color:#3b4a78;border:2px dashed #2b3b6b;transition:.3s}
 .slot.got{color:#fff;border-style:solid;border-color:rgba(255,255,255,.35);transform:scale(1.04)}
 
 /* Wheel */
@@ -123,14 +123,14 @@ h1,h2,.heb{font-family:"Frank Ruhl Libre",serif}
     <div class="logo">
       <div class="heb">מִי יוֹדֵעַ?</div>
       <div class="lat">Mi Yodea</div>
-      <div class="sub">Torá · Tanaj · Talmud · Halajá sefaradí</div>
+      <div class="sub">Torá · Tanaj · Talmud · Midrash · Halajá sefaradí</div>
     </div>
     <div class="levels" id="levels"></div>
     <div class="stack">
       <button class="btn" id="playSolo">▶ Jugar solo</button>
       <button class="btn ghost" id="playVs">⚔ Retar a un contacto</button>
     </div>
-    <p class="note">Gira la ruleta, responde y gana la letra de cada categoría.<br>Junta las 6 antes de perder tus 3 vidas.</p>
+    <p class="note">Gira la ruleta, responde y gana la letra de cada categoría.<br>Junta las 7 antes de perder tus 3 vidas.</p>
     <p class="note" style="margin-top:4px">Prototipo · las preguntas deben ser revisadas por un rabino antes de publicar.<br>
       <button class="link" id="unlockAll">Desbloquear todos los niveles (prueba)</button></p>
   </section>
@@ -199,7 +199,8 @@ const CATS=[
   {id:"ketuvim",name:"Ketuvim",         heb:"כתובים",  ini:"כ", color:"var(--c2)", hex:"#8a4fd8"},
   {id:"talmud", name:"Mishná y Talmud", heb:"תלמוד",   ini:"ש", color:"var(--c3)", hex:"#d9534f"},
   {id:"halaja", name:"Halajá sefaradí", heb:"הלכה",    ini:"ה", color:"var(--c4)", hex:"#2aa876"},
-  {id:"moadim", name:"Moadim",          heb:"מועדים",  ini:"מ", color:"var(--c5)", hex:"#e07b24"}
+  {id:"moadim", name:"Moadim",          heb:"מועדים",  ini:"מ", color:"var(--c5)", hex:"#e07b24"},
+  {id:"midrash",name:"Midrash",         heb:"מדרש",    ini:"ד", color:"#1aa3b3", hex:"#1aa3b3"}
 ];
 const LEVELS=[
   {n:1,name:"Talmid",heb:"תלמיד",desc:"Básico · parashá, personajes, festividades",time:20,ic:"א"},
@@ -279,7 +280,86 @@ const Q=[
 ["moadim",3,"¿Desde cuándo dicen Selijot los sefaradim?",["Desde Rosh Jodesh Elul","Una semana antes de Rosh Hashaná","Desde Tu BeAv","Solo en Yom Kipur"],0,"Shulján Aruj, Óraj Jaim 581:1"],
 ["moadim",3,"¿Cuántos toques de shofar se acostumbra escuchar en Rosh Hashaná?",["100","30","40","72"],0,"Tosafot, Rosh Hashaná 33b (citando al Arúj)"],
 ["moadim",3,"¿Qué se agrega en la Amidá desde Sheminí Atzeret?",["Mashiv harúaj umorid hagueshem","Yaalé veyavó","Al hanisim","Anenu"],0,"Shulján Aruj, Óraj Jaim 114:1"],
-["moadim",3,"Según Bet Hilel, ¿qué fecha es Rosh Hashaná de los árboles?",["15 de Shvat","1 de Shvat","15 de Av","1 de Elul"],0,"Mishná Rosh Hashaná 1:1"]
+["moadim",3,"Según Bet Hilel, ¿qué fecha es Rosh Hashaná de los árboles?",["15 de Shvat","1 de Shvat","15 de Av","1 de Elul"],0,"Mishná Rosh Hashaná 1:1"],
+// ===== Nuevas preguntas (v3) =====
+// TORÁ
+["tora",1,"¿Quién fue el primer hombre creado?",["Adam","Nóaj","Shet","Hevel"],0,"Bereshit 2:7"],
+["tora",1,"¿Cómo se llamaba el hermano mayor de Moshé?",["Aharón","Yehoshúa","Kóraj","Jur"],0,"Shemot 4:14; 7:7"],
+["tora",1,"¿Qué señal puso Hashem en el cielo después del diluvio?",["El arcoíris","Una estrella","Una nube de fuego","Un eclipse"],0,"Bereshit 9:13"],
+["tora",2,"¿Quién vendió su primogenitura por un guiso de lentejas?",["Esav","Yishmael","Reuvén","Kayín"],0,"Bereshit 25:33–34"],
+["tora",2,"¿Cuántos días y noches estuvo Moshé en el monte Sinaí?",["40","7","30","120"],0,"Shemot 24:18"],
+["tora",2,"¿Qué esposa de Yaakov murió en el camino a Efrat?",["Rajel","Leá","Bilhá","Zilpá"],0,"Bereshit 35:19"],
+["tora",2,"¿Cuántos meraglim (espías) envió Moshé a Kenáan?",["12","10","2","7"],0,"Bamidbar 13:2"],
+["tora",3,"¿Qué animal le habló a Bil'am?",["Su asna","Una serpiente","Un cuervo","Un león"],0,"Bamidbar 22:28"],
+["tora",3,"Según el Séfer HaJinuj, ¿cuál es la primera mitzvá de la Torá?",["Pru urvú (tener hijos)","Milá","Shabat","Kidush HaJódesh"],0,"Bereshit 1:28; Séfer HaJinuj 1"],
+["tora",3,"¿Quién era el padre de Pinjás?",["Elazar","Itamar","Aharón","Kalev"],0,"Bamidbar 25:7"],
+["tora",3,"¿Qué familia de leviím cargaba el Arón en el desierto?",["Kehat","Guershón","Merarí","Itamar"],0,"Bamidbar 4:15"],
+// NEVIÍM
+["neviim",1,"¿Quién fue el primer rey de Israel?",["Shaúl","David","Shlomó","Shmuel"],0,"Shmuel I 10"],
+["neviim",1,"¿Qué juez perdió su fuerza cuando le cortaron el cabello?",["Shimshón","Guideón","Yiftaj","Ehud"],0,"Shoftim 16:19"],
+["neviim",2,"¿Qué mujer rezó en Shiló y tuvo como hijo a Shmuel?",["Jana","Peniná","Rut","Mijal"],0,"Shmuel I 1"],
+["neviim",2,"¿Qué profeta enfrentó a los profetas del Baal en el monte Carmel?",["Eliyahu","Elishá","Ovadiá","Mijá"],0,"Melajim I 18"],
+["neviim",2,"¿Qué juez venció a Midián con solo 300 hombres?",["Guideón","Shimshón","Barak","Otniel"],0,"Shoftim 7:7"],
+["neviim",3,"¿Qué profeta reprendió a David con la parábola de la oveja del pobre?",["Natán","Gad","Shmuel","Ajiyá"],0,"Shmuel II 12"],
+["neviim",3,"¿Quién fue el discípulo y sucesor de Eliyahu?",["Elishá","Yoná","Gueijazí","Ovadiá"],0,"Melajim I 19:19–21"],
+["neviim",3,"¿Qué rey enfermo recibió 15 años más de vida?",["Jizkiyahu","Yoshiyahu","Ajav","Menashé"],0,"Melajim II 20:6"],
+// KETUVIM
+["ketuvim",1,"¿Qué reina salvó a los judíos de Persia?",["Ester","Vashti","Rut","Devorá"],0,"Meguilat Ester"],
+["ketuvim",1,"¿Qué meguilá se lee en Tishá BeAv?",["Ejá","Rut","Kohélet","Ester"],0,"Masejet Soferim 18"],
+["ketuvim",1,"¿Cómo se llamaba el malvado ministro de Ajashverosh?",["Hamán","Bigtán","Zéresh","Memujan"],0,"Ester 3:1"],
+["ketuvim",2,"Según la tradición, ¿quién escribió Meguilat Ejá?",["Yirmiyahu","Yeshayahu","David","Ezrá"],0,"Bavá Batrá 15a"],
+["ketuvim",2,"¿Qué rey de Persia permitió reconstruir el Bet HaMikdash?",["Koresh","Ajashverosh","Daryavesh","Nevujadnetzar"],0,"Ezrá 1:1–3"],
+["ketuvim",2,"¿Quién perdió hijos y bienes, y aun así no renegó de Hashem?",["Iyov","Daniel","Nejemiá","Boaz"],0,"Iyov 1–2"],
+["ketuvim",3,"¿Cuántos libros forman Ketuvim?",["11","12","8","13"],0,"Bavá Batrá 14b"],
+["ketuvim",3,"¿Qué libro de Ketuvim no menciona explícitamente el nombre de Hashem?",["Ester","Rut","Ejá","Daniel"],0,"Meguilat Ester"],
+["ketuvim",3,"¿De qué tribu era Mordejai?",["Biniamín","Yehudá","Leví","Efráim"],0,"Ester 2:5"],
+["ketuvim",3,"¿En qué capítulo de Mishlé está «Éshet Jáyil»?",["31","1","10","22"],0,"Mishlé 31:10–31"],
+// TALMUD
+["talmud",1,"¿Qué significa la palabra «Talmud»?",["Estudio, enseñanza","Ley escrita","Oración","Historia"],0,"Raíz l-m-d, «aprender»"],
+["talmud",1,"¿Cuánto se estudia cada día en el Daf Yomi?",["Una daf (hoja)","Un capítulo","Un tratado","Una línea"],0,"Ciclo del Daf Yomi"],
+["talmud",2,"Según la Guemará, ¿qué patriarca instituyó la tefilá de Shajarit?",["Abraham","Yitzjak","Yaakov","Moshé"],0,"Berajot 26b"],
+["talmud",2,"¿Qué tratado estudia las leyes de Pésaj?",["Pesajim","Sucá","Betzá","Meguilá"],0,"Masejet Pesajim"],
+["talmud",3,"¿Cuál es el tratado más largo del Talmud Bavlí?",["Bavá Batrá","Shabat","Berajot","Yevamot"],0,"Bavá Batrá: 176 dafim"],
+["talmud",3,"¿Cuántas cosas fueron creadas en la víspera del primer Shabat al anochecer?",["10","7","3","12"],0,"Pirké Avot 5:6"],
+["talmud",3,"Según la tradición, ¿quiénes concluyeron la redacción del Talmud Bavlí?",["Rav Ashí y Ravina","Abayé y Rabá","Hilel y Shamai","Rav y Shmuel"],0,"Bavá Metziá 86a"],
+["talmud",3,"¿Cuántos años estuvo escondido Rabí Shimón bar Yojai en la cueva?",["13","7","40","3"],0,"Shabat 33b"],
+// HALAJÁ SEFARADÍ
+["halaja",1,"¿Cuántas veces se reza la Amidá en un día común?",["3","2","4","1"],0,"Berajot 26b"],
+["halaja",1,"¿Qué berajá se dice antes de comer pan?",["Hamotzí","Mezonot","Shehakol","Haetz"],0,"Shulján Aruj, Óraj Jaim 167"],
+["halaja",2,"¿Cuál es la berajá de las frutas del árbol?",["Boré pri haetz","Boré pri haadamá","Shehakol","Boré minei mezonot"],0,"Shulján Aruj, Óraj Jaim 202:1"],
+["halaja",2,"¿Qué berajá se dice al ver un relámpago?",["Osé maasé bereshit","Shekojó ugvurató","Shehejeyanu","Hatov vehametiv"],0,"Shulján Aruj, Óraj Jaim 227:1"],
+["halaja",2,"¿A quién llaman los sefaradim «Maran»?",["Rabí Yosef Karo","El Rambam","Rav Ovadia Yosef","El Ben Ish Jai"],0,"Título de honor del autor del Shulján Aruj"],
+["halaja",3,"¿Quién escribió el Kaf HaJaim?",["Rav Yaakov Jaim Sofer","Rav Jaim Vital","Rabí Jaim ben Atar","El Jidá"],0,"Kaf HaJaim sobre Óraj Jaim"],
+["halaja",3,"¿Qué serie de libros de halajá sobre las festividades escribió Rav Ovadia Yosef?",["Jazón Ovadia","Mishná Berurá","Kitzur Shulján Aruj","Shemirat Shabat Kehiljatá"],0,"Jazón Ovadia"],
+["halaja",3,"¿Cuántos hilos cuelgan de cada esquina del talit?",["8","4","13","6"],0,"Shulján Aruj, Óraj Jaim 11"],
+// MOADIM
+["moadim",1,"¿Qué se toca en Rosh Hashaná?",["El shofar","La trompeta de plata","Una campana","El arpa"],0,"Bamidbar 29:1"],
+["moadim",1,"¿Qué se celebra en Simjat Torá?",["Terminar y volver a empezar la Torá","La salida de Egipto","La victoria de los Jashmonaím","El año nuevo de los árboles"],0,"Costumbre de Simjat Torá"],
+["moadim",2,"¿Cuántas copas de vino se toman en el Séder de Pésaj?",["4","3","2","7"],0,"Mishná Pesajim 10:1"],
+["moadim",2,"¿Qué festividad se llama «Zmán Matán Toratenu»?",["Shavuot","Pésaj","Sucot","Rosh Hashaná"],0,"Nusaj de la Amidá de Shavuot"],
+["moadim",2,"¿En qué fecha se celebra Purim (fuera de Yerushaláim)?",["14 de Adar","15 de Adar","13 de Adar","14 de Nisán"],0,"Ester 9:21; Meguilá 2a"],
+["moadim",3,"¿Qué ocurrió el 17 de Tamuz durante el segundo Bet HaMikdash?",["Se abrió una brecha en la muralla","Se destruyó el Bet HaMikdash","Murió Guedaliá","Comenzó el sitio de Nevujadnetzar"],0,"Mishná Taanit 4:6"],
+["moadim",3,"En Eretz Israel, ¿desde qué fecha se pide la lluvia en la Amidá?",["7 de Jeshván","1 de Tishrí","22 de Tishrí","15 de Shvat"],0,"Taanit 10a; Shulján Aruj, Óraj Jaim 117:1"],
+// MIDRASH
+["midrash",1,"Según el Midrash, ¿a qué se dedicaba Téraj, el padre de Abraham?",["Vendía ídolos","Era pastor","Era rey","Construía torres"],0,"Bereshit Rabá 38:13"],
+["midrash",1,"Según el Midrash, ¿qué hizo Abraham con los ídolos de su padre?",["Los rompió","Los vendió","Los enterró","Los quemó en el altar"],0,"Bereshit Rabá 38:13"],
+["midrash",1,"Según el Midrash, ¿por qué Moshé era «pesado de boca»?",["De niño se quemó la boca con un carbón","Nació mudo","Lo golpeó el Faraón","Por un voto"],0,"Shemot Rabá 1:26"],
+["midrash",1,"Según los Jajamim, ¿quién entró primero al Yam Suf antes de que se abriera?",["Najshón ben Aminadav","Moshé","Kalev","Aharón"],0,"Sotá 37a"],
+["midrash",2,"Según el Midrash, ¿qué animal persiguió Moshé, mostrando que merecía guiar a Israel?",["Un cabrito sediento","Un león","Una oveja herida","Un camello"],0,"Shemot Rabá 2:2"],
+["midrash",2,"Según los Jajamim, ¿por qué se dio la Torá en el monte Sinaí?",["Por ser el más humilde de los montes","Por ser el más alto","Por estar en Egipto","Por tener agua"],0,"Sotá 5a"],
+["midrash",2,"Según el Midrash, antes de dársela a Israel, ¿a quién ofreció Hashem la Torá?",["A las demás naciones","A los ángeles","Solo a Moshé","A los Avot"],0,"Sifré Devarim 343"],
+["midrash",2,"Según el Midrash, ¿qué rey arrojó a Abraham al horno de fuego en Ur Kasdim?",["Nimrod","El Faraón","Avimélej","Kedorlaómer"],0,"Bereshit Rabá 38:13"],
+["midrash",2,"¿Qué le entregó Rajel a Leá para no avergonzarla?",["Las señales (simanim) acordadas con Yaakov","Su anillo","Sus vestidos","Los terafim"],0,"Meguilá 13b"],
+["midrash",2,"¿Cómo llaman los Jajamim a la hija del Faraón que salvó a Moshé?",["Bitiá","Hagar","Osnat","Tziporá"],0,"Vaykrá Rabá 1:3"],
+["midrash",2,"Según el Midrash, ¿qué causó la muerte de Sará?",["La noticia de la Akedá","Una enfermedad","Su vejez solamente","El hambre en Kenáan"],0,"Rashi, Bereshit 23:2"],
+["midrash",3,"¿Quién le mostró a Moshé dónde estaba el ataúd de Yosef?",["Séraj bat Asher","Yojéved","Miriam","Bitiá"],0,"Sotá 13a"],
+["midrash",3,"Según el Midrash, ¿qué gigante sobrevivió al diluvio aferrado a la tevá?",["Og","Goliat","Nimrod","Sijón"],0,"Pirké deRabí Eliézer 23"],
+["midrash",3,"¿Cuándo fue creado el carnero que sacrificó Abraham en la Akedá?",["En la víspera del primer Shabat","El día de la Akedá","El primer día de la Creación","Después del diluvio"],0,"Pirké Avot 5:6"],
+["midrash",3,"Según el Midrash, ¿qué le mostró Hashem a Moshé al ordenarle el majatzit hashékel?",["Una moneda de fuego","Una vara de oro","Una tabla de zafiro","Una nube"],0,"Rashi, Shemot 30:13"],
+["midrash",3,"Según los Jajamim, ¿en la yeshivá de quiénes estudió Yaakov 14 años?",["Shem y Éver","Abraham y Yitzjak","Malkitzédek y Lot","Metushélaj y Nóaj"],0,"Meguilá 17a; Rashi, Bereshit 28:9"],
+["midrash",3,"Según el Midrash, ¿qué edad tenía Yitzjak en la Akedá?",["37 años","13 años","5 años","20 años"],0,"Bereshit Rabá 56:8"],
+["midrash",3,"Según la Guemará, ¿quiénes fueron los tres consejeros del Faraón?",["Bil'am, Iyov y Yitró","Datán, Aviram y Kóraj","Yanés, Yambrés y Bil'am","Laván, Esav y Amalek"],0,"Sotá 11a"]
+
 ].map(([cat,lvl,q,opts,a,src])=>({cat,lvl,q,opts,a,src}));
 
 const $=s=>document.querySelector(s);
@@ -332,16 +412,16 @@ function renderLevels(){
 }
 
 function drawWheel(){
-  const svg=$("#wheel"),c=150,r=146,n=CATS.length;let h="";
+  const svg=$("#wheel"),c=150,r=146,n=CATS.length,W=360/n;let h="";
   const pt=(a,rr)=>[c+rr*Math.sin(a*Math.PI/180),c-rr*Math.cos(a*Math.PI/180)];
   CATS.forEach((k,i)=>{
-    const a0=i*60,a1=a0+60,[x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r),mid=a0+30,[tx,ty]=pt(mid,96);
+    const a0=i*W,a1=a0+W,[x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r),mid=a0+W/2,[tx,ty]=pt(mid,96);
     h+=`<path d="M${c},${c} L${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1} Z" fill="${k.hex}" stroke="#0d1b3d" stroke-width="3"/>`;
     h+=`<text x="${tx}" y="${ty}" transform="rotate(${mid} ${tx} ${ty})" text-anchor="middle" dominant-baseline="middle"
-         fill="#fff" font-family="Frank Ruhl Libre" font-weight="900" font-size="22">${k.heb}</text>`;
+         fill="#fff" font-family="Frank Ruhl Libre" font-weight="900" font-size="20">${k.heb}</text>`;
     const [sx,sy]=pt(mid,128);
     h+=`<text x="${sx}" y="${sy}" transform="rotate(${mid} ${sx} ${sy})" text-anchor="middle" dominant-baseline="middle"
-         fill="rgba(255,255,255,.85)" font-family="Rubik" font-weight="700" font-size="9.5">${k.name.toUpperCase()}</text>`;
+         fill="rgba(255,255,255,.85)" font-family="Rubik" font-weight="700" font-size="8.5">${k.name.toUpperCase()}</text>`;
   });
   h+=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#e8b931" stroke-width="6"/>`;
   for(let i=0;i<24;i++){const[x,y]=pt(i*15,r);h+=`<circle cx="${x}" cy="${y}" r="3.2" fill="#f6d77a"/>`}
@@ -364,8 +444,8 @@ $("#spinBtn").onclick=()=>{
   $("#spinBtn").disabled=true;$("#spinMsg").textContent="Girando…";sfx.spin();
   // preferir categorías aún no ganadas
   const pend=CATS.map((k,i)=>i).filter(i=>!S.got.has(CATS[i].id));
-  const idx=Math.random()<.8&&pend.length?pend[Math.floor(Math.random()*pend.length)]:Math.floor(Math.random()*6);
-  const target=360-(idx*60+30)+(Math.random()*30-15);
+  const idx=Math.random()<.8&&pend.length?pend[Math.floor(Math.random()*pend.length)]:Math.floor(Math.random()*CATS.length);
+  const W=360/CATS.length,target=360-(idx*W+W/2)+(Math.random()*W*.5-W*.25);
   const cur=((rot%360)+360)%360;
   rot+=360*5+((target-cur+360)%360);
   $("#wheel").style.transform=`rotate(${rot}deg)`;
@@ -412,7 +492,7 @@ function answer(q,cat,i){
 }
 
 $("#nextBtn").onclick=()=>{
-  if(S.got.size===6)return finish(true);
+  if(S.got.size===CATS.length)return finish(true);
   if(S.lives<=0)return finish(false);
   $("#spinBtn").disabled=false;$("#spinMsg").textContent="¡Gira otra vez!";show("spin");
 };
@@ -424,7 +504,7 @@ function finish(win){
   $("#resIcon").textContent=win?"👑":"📖";setTimeout(()=>win?sfx.win():sfx.lose(),150);
   $("#resTitle").textContent=win?`¡Completaste ${L.name}!`:"Fin de la partida";
   $("#resText").textContent=win?(level<3?`Desbloqueaste el nivel ${LEVELS[level].name}.`:"¡Eres un verdadero Jajam!"):
-    `Ganaste ${S.got.size} de 6 letras. Sigue estudiando.`;
+    `Ganaste ${S.got.size} de ${CATS.length} letras. Sigue estudiando.`;
   $("#resScore").textContent=S.score+" pts";
   $("#againBtn").textContent=win&&level<3?`Jugar ${LEVELS[level].name}`:"Jugar otra vez";
   $("#againBtn").onclick=()=>{if(win&&level<3)level++;newGame()};
